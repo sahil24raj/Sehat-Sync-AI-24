@@ -1,6 +1,6 @@
 fastapi
 uvicorn
-scikit-learn
 pandas
 pydantic
-joblib
+groq
+python-dotenv

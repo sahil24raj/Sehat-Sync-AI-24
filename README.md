@@ -4,19 +4,19 @@ MedAlloc AI is a full-stack, AI-powered web application designed to intelligentl
 
 ## 🚀 Features
 - **Real-Time Dashboard**: Monitor hospital capacities via dynamic charts.
-- **AI Priority Engine**: Machine learning model (Random Forest) evaluates patient vitals and assigns a priority score (Low/Medium/High).
+- **AI Priority Engine**: Groq Cloud API (LLM) evaluates patient vitals and assigns a priority score (Low/Medium/High) instantly.
 - **Smart Allocation**: Automatically assigns high-priority patients to nearest hospitals with available ICU beds/ventilators.
 - **WebSocket Alerts**: Real-time notifications for new patients and resource depletion.
 
 ## 🛠️ Tech Stack
 - **Frontend**: React.js (Vite), Tailwind CSS, Chart.js, React Router
 - **Backend**: Node.js, Express.js, MongoDB (Memory Server for Hackathon prototype), Socket.io
-- **AI Microservice**: Python, FastAPI, scikit-learn, Pandas
+- **AI Microservice**: Python, FastAPI, Groq Cloud API (LLaMA 3)
 
 ## 🏗️ System Architecture
 1. **Client Layer**: React-based UI communicating with the Node backend via REST APIs and WebSockets.
 2. **Backend Middleware**: Node.js/Express server that handles database operations, patient state management, and real-time socket events.
-3. **ML Inference Layer**: FastAPI server running a scikit-learn model, which returns instantaneous severity and priority scoring for dynamic allocation.
+3. **AI Inference Layer**: FastAPI server integrating with Groq Cloud API, which returns instantaneous severity and priority scoring for dynamic allocation.
 
 ## 📡 Key API Endpoints
 ### Backend Server (`localhost:5000`)
@@ -30,14 +30,16 @@ MedAlloc AI is a full-stack, AI-powered web application designed to intelligentl
 ## ⚙️ Setup & Installation
 
 ### 1. AI Microservice (`/ml-service`)
-This service uses a Random Forest model trained on dummy data.
+This service uses Groq Cloud API for priority prediction.
 ```bash
 cd ml-service
 python -m venv venv
 .\venv\Scripts\activate   # Windows
 pip install -r requirements.txt
-python generate_data.py
-python model_training.py
+
+# Create a .env file and add your Groq API Key
+echo GROQ_API_KEY=your_api_key_here > .env
+
 uvicorn main:app --reload --port 8000
 ```
 
