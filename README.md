@@ -13,6 +13,20 @@ MedAlloc AI is a full-stack, AI-powered web application designed to intelligentl
 - **Backend**: Node.js, Express.js, MongoDB (Memory Server for Hackathon prototype), Socket.io
 - **AI Microservice**: Python, FastAPI, scikit-learn, Pandas
 
+## 🏗️ System Architecture
+1. **Client Layer**: React-based UI communicating with the Node backend via REST APIs and WebSockets.
+2. **Backend Middleware**: Node.js/Express server that handles database operations, patient state management, and real-time socket events.
+3. **ML Inference Layer**: FastAPI server running a scikit-learn model, which returns instantaneous severity and priority scoring for dynamic allocation.
+
+## 📡 Key API Endpoints
+### Backend Server (`localhost:5000`)
+- `GET /api/hospitals`: Fetches all hospitals and their current real-time resources.
+- `GET /api/patients`: Fetches all admitted patients and their allocated hospitals.
+- `POST /api/patients`: Submits a new patient, calculates priority via ML service, allocates a hospital bed, and emits socket events.
+
+### AI Microservice (`localhost:8000`)
+- `POST /predict`: Accepts `age`, `oxygen_level`, `symptoms_severity`, and `comorbidities`. Returns `priority_score` (0-100) and `priority_label` (Low/Medium/High).
+
 ## ⚙️ Setup & Installation
 
 ### 1. AI Microservice (`/ml-service`)
