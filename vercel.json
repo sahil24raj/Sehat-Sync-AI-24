@@ -1,12 +1,21 @@
 {
   "version": 2,
-  "buildCommand": "npm run build",
-  "installCommand": "npm install",
-  "outputDirectory": "dist",
   "rewrites": [
     {
+      "source": "/api/patients",
+      "destination": "/api/patients.js"
+    },
+    {
+      "source": "/api/hospitals",
+      "destination": "/api/hospitals.js"
+    },
+    {
+      "source": "/api/test",
+      "destination": "/api/test.js"
+    },
+    {
       "source": "/api/:path*",
-      "destination": "/api/:path*"
+      "destination": "/api/index.js"
     },
     {
       "source": "/((?!api/).*)",
