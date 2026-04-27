@@ -2,35 +2,36 @@ const express = require('express');
 const cors = require('cors');
 const http = require('http');
 const { Server } = require('socket.io');
-const { db } = require('./firebase');
 
 const app = express();
-app.use(cors());
-app.use(express.json());
 
-// Socket.io setup (Mocked for Vercel)
-const server = http.createServer(app);
-const io = new Server(server, {
-  cors: { origin: '*', methods: ['GET', 'POST'] }
+// Manual CORS to be super safe
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+  res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type,Authorization');
+  next();
 });
 
+app.use(express.json());
+
 // Import API routes
+const io = { emit: () => {} }; // Mock io for Vercel
 const apiRoutes = require('./routes/api')(io);
 
-// Mount routes at root. 
-// The vercel.json rewrite will point /api/* to this app.
-// If the URL is /api/patients, Express will see it as /api/patients.
-// So we mount at /api for consistency.
+// Mount at both to be safe
 app.use('/api', apiRoutes);
+app.use('/', apiRoutes);
 
-// Fallback for root calls
-app.get('/', (req, res) => res.send('Sehat Sync API is online.'));
+// Export for Vercel
+module.exports = app;
 
-// Only start server locally
+// Local dev server
 if (!process.env.VERCEL) {
+  const server = http.createServer(app);
+  const realIo = new Server(server, { cors: { origin: '*' } });
+  // Re-attach real routes with real IO
+  app.use('/api', require('./routes/api')(realIo));
   const PORT = process.env.PORT || 5000;
   server.listen(PORT, () => console.log(`Server running on ${PORT}`));
 }
-
-// IMPORTANT: Export app for Vercel
-module.exports = app;
