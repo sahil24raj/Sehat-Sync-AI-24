@@ -53,17 +53,20 @@ module.exports = function(io) {
       // 1. Get Priority from ML Service
       let priority_score = 50;
       let priority_label = "Medium";
+      const ML_SERVICE_URL = process.env.ML_SERVICE_URL || 'http://127.0.0.1:8000';
+      
       try {
-        const mlResponse = await axios.post('http://127.0.0.1:8000/predict', {
-          age,
-          oxygen_level,
-          symptoms_severity,
-          comorbidities
-        });
+        const mlResponse = await axios.post(`${ML_SERVICE_URL}/predict`, {
+          age: parseInt(age) || 30,
+          oxygen_level: parseInt(oxygen_level) || 95,
+          symptoms_severity: parseInt(symptoms_severity) || 50,
+          comorbidities: parseInt(comorbidities) || 0
+        }, { timeout: 3000 }); // 3 second timeout for AI
+        
         priority_score = mlResponse.data.priority_score;
         priority_label = mlResponse.data.priority_label;
       } catch (mlErr) {
-        console.error("ML Service error, using fallback priority.");
+        console.error("ML Service error (fallback used):", mlErr.message);
       }
 
       // 2. Find nearest hospital with resources
@@ -72,7 +75,12 @@ module.exports = function(io) {
       let minDistance = Infinity;
 
       for (let h of hospitals) {
-        const dist = getDistanceFromLatLonInKm(location.lat, location.lng, h.location.lat, h.location.lng);
+        if (!h.location || typeof h.location.lat !== 'number' || typeof h.location.lng !== 'number') continue;
+        
+        const patientLat = location?.lat || 28.6139;
+        const patientLng = location?.lng || 77.2090;
+        
+        const dist = getDistanceFromLatLonInKm(patientLat, patientLng, h.location.lat, h.location.lng);
         // Basic check: Needs ICU if severity is high or oxygen is very low, else general bed
         let canAccept = false;
         if (priority_label === 'High') {

@@ -6,7 +6,7 @@ export default function PatientForm() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
-    name: '', age: '', symptoms: '', symptoms_severity: 50, oxygen_level: 95, comorbidities: 0, lat: 28.6139, lng: 77.2090
+    name: '', age: 0, symptoms: '', symptoms_severity: 50, oxygen_level: 95, comorbidities: 0, lat: 28.6139, lng: 77.2090
   });
 
   const handleSubmit = async (e) => {
@@ -39,8 +39,11 @@ export default function PatientForm() {
               <input type="text" required placeholder="jaise: Rajesh Kumar" className="neon-input" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} />
             </div>
             <div>
-              <label className="neon-label block mb-2">UMRA</label>
-              <input type="number" required min="0" max="120" placeholder="jaise: 45" className="neon-input" value={formData.age} onChange={e => setFormData({...formData, age: parseInt(e.target.value)})} />
+              <label className="neon-label flex items-center gap-2 mb-2">
+                <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>calendar_today</span>
+                UMRA
+              </label>
+              <input type="number" required min="0" max="120" placeholder="jaise: 45" className="neon-input" value={formData.age || ''} onChange={e => setFormData({...formData, age: e.target.value ? parseInt(e.target.value) : 0})} />
             </div>
           </div>
 
