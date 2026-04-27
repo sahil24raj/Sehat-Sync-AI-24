@@ -1,2 +1,4 @@
 const app = require('../server/index');
-module.exports = app;
+module.exports = (req, res) => {
+  return app(req, res);
+};
