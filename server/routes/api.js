@@ -184,7 +184,7 @@ module.exports = function(io) {
   router.put('/appointments/:id/status', async (req, res) => {
     try {
       const { status } = req.body;
-      const appointment = await Appointment.findByIdAndUpdate(req.params.id, { status }, { new: true });
+      const appointment = await Appointment.findByIdAndUpdate(req.params.id, { status }, { returnDocument: 'after' });
       
       if (!appointment) return res.status(404).json({ message: 'Appointment not found' });
 
