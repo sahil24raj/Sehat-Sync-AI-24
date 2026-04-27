@@ -12,14 +12,14 @@ export default function AppointmentBooking() {
   const [doctorSlots, setDoctorSlots] = useState([]);
   const [formData, setFormData] = useState({
     patient_name: '', hospital_id: '', doctor_name: 'Dr. Priya Sharma',
-    problem_type: 'Sardi Khansi (Common Cold)', preferred_time: '', priority_level: 'General'
+    problem_type: 'Sardi Khansi', preferred_time: '', priority_level: 'General'
   });
 
   const doctors = [
-    { name: 'Dr. Priya Sharma', specialty: 'General Physician', icon: 'stethoscope' },
-    { name: 'Dr. Rajesh Gupta', specialty: 'Cardiologist', icon: 'cardiology' },
-    { name: 'Dr. Anjali Mehta', specialty: 'Neurologist', icon: 'psychology' },
-    { name: 'Dr. Vikram Patel', specialty: 'Pediatrician', icon: 'child_care' }
+    { name: 'Dr. Priya Sharma', specialty: 'Aam Chikitsak', icon: 'stethoscope' },
+    { name: 'Dr. Rajesh Gupta', specialty: 'Hriday Rog Visheshagya', icon: 'cardiology' },
+    { name: 'Dr. Anjali Mehta', specialty: 'Naadi Tantrika Visheshagya', icon: 'psychology' },
+    { name: 'Dr. Vikram Patel', specialty: 'Bachho Ke Doctor', icon: 'child_care' }
   ];
 
   useEffect(() => {
@@ -30,10 +30,7 @@ export default function AppointmentBooking() {
   }, []);
 
   useEffect(() => {
-    if (formData.hospital_id) {
-      axios.get(`${API_URL}/api/appointments/doctor-slots/${formData.hospital_id}`)
-        .then(res => setDoctorSlots(res.data)).catch(console.error);
-    }
+    if (formData.hospital_id) axios.get(`${API_URL}/api/appointments/doctor-slots/${formData.hospital_id}`).then(res => setDoctorSlots(res.data)).catch(console.error);
   }, [formData.hospital_id]);
 
   const fetchEstimate = useCallback(async () => {
@@ -55,15 +52,15 @@ export default function AppointmentBooking() {
   const handleBooking = async (e) => {
     e.preventDefault(); setLoading(true);
     try { const res = await axios.post(`${API_URL}/api/appointments`, formData); setBookingConfirmed(res.data); }
-    catch (error) { console.error(error); alert('Booking failed!'); }
+    catch (error) { console.error(error); alert('Booking fail ho gayi! Phir se try karein.'); }
     setLoading(false);
   };
 
   const selectedDoctor = doctors.find(d => d.name === formData.doctor_name);
   const preferredTimeDisplay = (() => {
-    if (!formData.preferred_time) return 'NOW';
+    if (!formData.preferred_time) return 'ABHI';
     const d = new Date(formData.preferred_time);
-    return isNaN(d.getTime()) ? 'NOW' : d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    return isNaN(d.getTime()) ? 'ABHI' : d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   })();
 
   if (bookingConfirmed) {
@@ -71,8 +68,8 @@ export default function AppointmentBooking() {
       <div className="max-w-md mx-auto">
         <div className="text-center mb-8">
           <span className="material-symbols-outlined neon-text" style={{ fontSize: '48px', fontVariationSettings: "'FILL' 1" }}>task_alt</span>
-          <h2 className="neon-text mt-4" style={{ fontFamily: 'Space Grotesk', fontSize: '24px', fontWeight: 700 }}>BOOKING_CONFIRMED</h2>
-          <p style={{ color: '#849495', fontFamily: 'Space Grotesk', fontSize: '12px', letterSpacing: '0.1em', marginTop: '4px' }}>TOKEN_GENERATED_SUCCESSFULLY</p>
+          <h2 className="neon-text mt-4" style={{ fontFamily: 'Space Grotesk', fontSize: '24px', fontWeight: 700 }}>BOOKING_PAKKI_HO_GAYI!</h2>
+          <p style={{ color: '#849495', fontFamily: 'Space Grotesk', fontSize: '12px', letterSpacing: '0.1em', marginTop: '4px' }}>AAPKA_TOKEN_BAN_GAYA_HAI</p>
         </div>
         <div className="ticket-shadow">
           <div className="p-6 rounded-t-lg" style={{ background: 'linear-gradient(135deg, rgba(0,219,233,0.15), rgba(188,255,95,0.08))', border: '1px solid rgba(0,219,233,0.25)', borderBottom: 'none' }}>
@@ -84,9 +81,11 @@ export default function AppointmentBooking() {
               <span className="material-symbols-outlined" style={{ color: 'rgba(0,219,233,0.15)', fontSize: '48px' }}>confirmation_number</span>
             </div>
             <div className="mt-6 grid grid-cols-2 gap-4">
-              <div><p style={{ fontSize: '10px', color: '#3b494b', fontFamily: 'Space Grotesk', fontWeight: 700 }}>PATIENT</p><p style={{ color: '#e2e2e8', fontFamily: 'Space Grotesk', fontWeight: 600 }}>{bookingConfirmed.patient_name}</p></div>
-              <div className="text-right"><p style={{ fontSize: '10px', color: '#3b494b', fontFamily: 'Space Grotesk', fontWeight: 700 }}>PRIORITY</p>
-                <span className="px-2 py-0.5 rounded" style={{ fontSize: '10px', fontFamily: 'Space Grotesk', fontWeight: 700, background: bookingConfirmed.priority_level === 'Emergency' ? 'rgba(147,0,10,0.4)' : 'rgba(0,219,233,0.1)', color: bookingConfirmed.priority_level === 'Emergency' ? '#ffb4ab' : '#00dbe9', border: '1px solid rgba(0,219,233,0.2)' }}>{bookingConfirmed.priority_level?.toUpperCase()}</span>
+              <div><p style={{ fontSize: '10px', color: '#3b494b', fontFamily: 'Space Grotesk', fontWeight: 700 }}>MAREEZ</p><p style={{ color: '#e2e2e8', fontFamily: 'Space Grotesk', fontWeight: 600 }}>{bookingConfirmed.patient_name}</p></div>
+              <div className="text-right"><p style={{ fontSize: '10px', color: '#3b494b', fontFamily: 'Space Grotesk', fontWeight: 700 }}>ZAROORAT</p>
+                <span className="px-2 py-0.5 rounded" style={{ fontSize: '10px', fontFamily: 'Space Grotesk', fontWeight: 700, background: bookingConfirmed.priority_level === 'Emergency' ? 'rgba(147,0,10,0.4)' : 'rgba(0,219,233,0.1)', color: bookingConfirmed.priority_level === 'Emergency' ? '#ffb4ab' : '#00dbe9' }}>
+                  {bookingConfirmed.priority_level === 'Emergency' ? 'ATYAVASTHA' : bookingConfirmed.priority_level === 'Priority' ? 'ZARURI' : 'SAADHARAN'}
+                </span>
               </div>
             </div>
           </div>
@@ -102,17 +101,13 @@ export default function AppointmentBooking() {
                 <span style={{ fontFamily: 'Space Grotesk' }}>{bookingConfirmed.doctor_name}</span>
               </div>
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <span className="material-symbols-outlined" style={{ fontSize: '16px', color: '#bcff5f' }}>schedule</span>
-                  <div><p style={{ fontSize: '10px', color: '#3b494b', fontFamily: 'Space Grotesk', fontWeight: 700 }}>ESTIMATED_TIME</p>
-                    <p style={{ fontSize: '20px', fontFamily: 'Space Grotesk', fontWeight: 700, color: '#e2e2e8' }}>{new Date(bookingConfirmed.estimated_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
-                  </div>
-                </div>
-                <div className="text-right"><p style={{ fontSize: '10px', color: '#3b494b', fontFamily: 'Space Grotesk', fontWeight: 700 }}>AHEAD_IN_QUEUE</p><p className="neon-text" style={{ fontSize: '24px', fontFamily: 'Space Grotesk', fontWeight: 700 }}>{bookingConfirmed.queue_number - 1}</p></div>
+                <div><p style={{ fontSize: '10px', color: '#3b494b', fontFamily: 'Space Grotesk', fontWeight: 700 }}>ANUMAAN_SAMAY</p>
+                  <p style={{ fontSize: '20px', fontFamily: 'Space Grotesk', fontWeight: 700, color: '#e2e2e8' }}>{new Date(bookingConfirmed.estimated_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p></div>
+                <div className="text-right"><p style={{ fontSize: '10px', color: '#3b494b', fontFamily: 'Space Grotesk', fontWeight: 700 }}>AAPSE_PEHLE</p><p className="neon-text" style={{ fontSize: '24px', fontFamily: 'Space Grotesk', fontWeight: 700 }}>{bookingConfirmed.queue_number - 1}</p></div>
               </div>
             </div>
             <button onClick={() => { setBookingConfirmed(null); setEstimate(null); }} className="w-full mt-6 py-3 rounded neon-btn flex items-center justify-center gap-2">
-              <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>refresh</span> NEW_BOOKING
+              <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>refresh</span> NAYA_APPOINTMENT_BOOK_KAREIN
             </button>
           </div>
         </div>
@@ -123,12 +118,12 @@ export default function AppointmentBooking() {
   return (
     <div className="max-w-6xl mx-auto space-y-8">
       <header className="text-center">
-        <h1 className="neon-text flex items-center justify-center gap-3" style={{ fontFamily: 'Space Grotesk', fontSize: '28px', fontWeight: 700, letterSpacing: '-0.02em' }}>
+        <h1 className="neon-text flex items-center justify-center gap-3" style={{ fontFamily: 'Space Grotesk', fontSize: '28px', fontWeight: 700 }}>
           <span className="material-symbols-outlined" style={{ fontSize: '28px', fontVariationSettings: "'FILL' 1" }}>calendar_month</span>
           SMART_APPOINTMENT_BOOKING
         </h1>
         <p style={{ color: '#849495', fontFamily: 'Space Grotesk', fontSize: '13px', letterSpacing: '0.05em', marginTop: '6px' }}>
-          PREDICTED TOKEN & ESTIMATED TIME — LIKE TRAIN TICKET BOOKING
+          APNA TOKEN AUR SAMAY DEKHEIN — JAISE TRAIN TICKET BOOKING 🚆
         </p>
       </header>
 
@@ -137,28 +132,28 @@ export default function AppointmentBooking() {
           <div className="glass-panel p-8">
             <form onSubmit={handleBooking} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div><label className="neon-label block mb-2">PATIENT_NAME</label>
-                  <input type="text" required placeholder="e.g. Rahul Kumar" className="neon-input" value={formData.patient_name} onChange={e => setFormData({...formData, patient_name: e.target.value})} /></div>
-                <div><label className="neon-label block mb-2">HOSPITAL_NODE</label>
+                <div><label className="neon-label block mb-2">MAREEZ_KA_NAAM</label>
+                  <input type="text" required placeholder="jaise: Amit Verma" className="neon-input" value={formData.patient_name} onChange={e => setFormData({...formData, patient_name: e.target.value})} /></div>
+                <div><label className="neon-label block mb-2">HOSPITAL_CHUNEIN</label>
                   <select className="neon-input" style={{ cursor: 'pointer' }} value={formData.hospital_id} onChange={e => setFormData({...formData, hospital_id: e.target.value})}>
                     {hospitals.map(h => <option key={h._id} value={h._id} style={{ background: '#111318' }}>{h.name}</option>)}
                   </select></div>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div><label className="neon-label block mb-2">SELECT_DOCTOR</label>
+                <div><label className="neon-label block mb-2">DOCTOR_CHUNEIN</label>
                   <select className="neon-input" style={{ cursor: 'pointer' }} value={formData.doctor_name} onChange={e => setFormData({...formData, doctor_name: e.target.value})}>
                     {doctors.map(d => <option key={d.name} value={d.name} style={{ background: '#111318' }}>{d.name} ({d.specialty})</option>)}
                   </select></div>
-                <div><label className="neon-label block mb-2">PREFERRED_TIME</label>
+                <div><label className="neon-label block mb-2">SAMAY_CHUNEIN</label>
                   <input type="datetime-local" required className="neon-input" value={formData.preferred_time} onChange={e => setFormData({...formData, preferred_time: e.target.value})} /></div>
               </div>
-              <div><label className="neon-label block mb-2">PROBLEM_TYPE</label>
-                <textarea required rows="2" placeholder="e.g. Sardi, Bukhar, Sar Dard" className="neon-input resize-none" style={{ borderBottom: 'none', border: '1px solid rgba(59,73,75,0.4)', borderRadius: '0.25rem', padding: '0.75rem' }} value={formData.problem_type} onChange={e => setFormData({...formData, problem_type: e.target.value})} /></div>
+              <div><label className="neon-label block mb-2">BIMARI_YA_SAMASYA</label>
+                <textarea required rows="2" placeholder="jaise: Sardi, Bukhar, Sar Dard, Pet Dard" className="neon-input resize-none" style={{ borderBottom: 'none', border: '1px solid rgba(59,73,75,0.4)', borderRadius: '0.25rem', padding: '0.75rem' }} value={formData.problem_type} onChange={e => setFormData({...formData, problem_type: e.target.value})} /></div>
               <div className="flex gap-3 pt-4">
                 {[
-                  { level: 'General', label: 'GENERAL', color: '#00dbe9' },
-                  { level: 'Priority', label: 'PRIORITY', color: '#bcff5f' },
-                  { level: 'Emergency', label: 'EMERGENCY', color: '#ffb4ab' }
+                  { level: 'General', label: 'SAADHARAN', color: '#00dbe9' },
+                  { level: 'Priority', label: 'ZARURI', color: '#bcff5f' },
+                  { level: 'Emergency', label: 'ATYAVASTHA', color: '#ffb4ab' }
                 ].map(({ level, label, color }) => (
                   <button key={level} type="button" onClick={() => setFormData({...formData, priority_level: level})}
                     className="flex-1 py-3 rounded transition-all" style={{
@@ -171,7 +166,7 @@ export default function AppointmentBooking() {
                 ))}
               </div>
               <button type="submit" disabled={loading} className="w-full py-4 rounded neon-btn-solid flex items-center justify-center gap-3 disabled:opacity-50">
-                {loading ? <span className="animate-pulse">ANALYZING_QUEUE...</span> : <><span>GENERATE_SMART_TOKEN</span><span className="material-symbols-outlined" style={{ fontSize: '20px' }}>arrow_forward</span></>}
+                {loading ? <span className="animate-pulse">QUEUE_JAANCH_HO_RAHI_HAI...</span> : <><span>SMART_TOKEN_BANAYEIN</span><span className="material-symbols-outlined" style={{ fontSize: '20px' }}>arrow_forward</span></>}
               </button>
             </form>
           </div>
@@ -180,7 +175,7 @@ export default function AppointmentBooking() {
             <div className="glass-panel p-6">
               <h3 className="neon-label mb-4 flex items-center gap-2" style={{ fontSize: '14px' }}>
                 <span className="material-symbols-outlined" style={{ fontSize: '18px', color: '#00dbe9' }}>groups</span>
-                DOCTOR_QUEUE_STATUS
+                DOCTOR_QUEUE_STHITI
                 <span className="pulse-glow inline-block ml-2" style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#00dbe9' }}></span>
                 <span style={{ fontSize: '10px', color: '#bcff5f' }}>LIVE</span>
               </h3>
@@ -200,15 +195,15 @@ export default function AppointmentBooking() {
                           <span className="material-symbols-outlined align-middle mr-1" style={{ fontSize: '16px', color: '#00dbe9' }}>{doc?.icon}</span>
                           {slot.doctor_name}
                         </span>
-                        <span className="px-2 py-0.5 rounded" style={{ fontSize: '9px', fontFamily: 'Space Grotesk', fontWeight: 700, letterSpacing: '0.1em',
-                          background: slot.patients_waiting === 0 ? 'rgba(188,255,95,0.1)' : slot.patients_waiting <= 2 ? 'rgba(174,198,255,0.1)' : 'rgba(255,180,171,0.1)',
-                          color: slot.patients_waiting === 0 ? '#bcff5f' : slot.patients_waiting <= 2 ? '#aec6ff' : '#ffb4ab',
-                          border: `1px solid ${slot.patients_waiting === 0 ? 'rgba(188,255,95,0.15)' : 'rgba(59,73,75,0.2)'}`
-                        }}>{slot.patients_waiting === 0 ? 'AVAILABLE' : `${slot.patients_waiting} WAITING`}</span>
+                        <span className="px-2 py-0.5 rounded" style={{ fontSize: '9px', fontFamily: 'Space Grotesk', fontWeight: 700,
+                          background: slot.patients_waiting === 0 ? 'rgba(188,255,95,0.1)' : 'rgba(255,180,171,0.1)',
+                          color: slot.patients_waiting === 0 ? '#bcff5f' : '#ffb4ab',
+                          border: `1px solid ${slot.patients_waiting === 0 ? 'rgba(188,255,95,0.15)' : 'rgba(255,180,171,0.15)'}`
+                        }}>{slot.patients_waiting === 0 ? 'UPALABDH' : `${slot.patients_waiting} INTEZAAR`}</span>
                       </div>
                       <div className="flex items-center justify-between" style={{ fontSize: '11px', color: '#3b494b', fontFamily: 'Space Grotesk' }}>
-                        <span>NEXT_TOKEN: <span style={{ color: '#e2e2e8', fontWeight: 700 }}>#{slot.next_token}</span></span>
-                        <span>AVAILABLE: <span style={{ color: '#bcff5f', fontWeight: 700 }}>{slot.next_available}</span></span>
+                        <span>AGLA_TOKEN: <span style={{ color: '#e2e2e8', fontWeight: 700 }}>#{slot.next_token}</span></span>
+                        <span>MILEGA: <span style={{ color: '#bcff5f', fontWeight: 700 }}>{slot.next_available}</span></span>
                       </div>
                     </button>
                   );
@@ -218,50 +213,48 @@ export default function AppointmentBooking() {
           )}
         </div>
 
-        {/* Sidebar */}
         <div className="space-y-6">
           <div className="glass-panel overflow-hidden" style={{ borderColor: 'rgba(0,219,233,0.2)' }}>
             <div className="px-5 py-3 flex items-center justify-between" style={{ background: 'rgba(0,219,233,0.05)', borderBottom: '1px solid rgba(0,219,233,0.1)' }}>
               <h3 className="neon-label flex items-center gap-2" style={{ fontSize: '12px' }}>
                 <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>confirmation_number</span>
-                LIVE_TOKEN_PREVIEW
+                LIVE_TOKEN_JHAANKI
               </h3>
               {estimateLoading && <span className="pulse-glow inline-block" style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#00dbe9' }}></span>}
             </div>
             {estimate ? (
               <div className="p-5 space-y-4">
                 <div className="p-4 rounded relative overflow-hidden" style={{ background: 'rgba(12,14,18,0.8)', border: '1px solid rgba(59,73,75,0.3)' }}>
-                  <div className="absolute top-0 right-0 w-16 h-16" style={{ background: 'radial-gradient(circle at top right, rgba(0,219,233,0.08), transparent)' }}></div>
-                  <p style={{ fontSize: '10px', color: '#3b494b', fontFamily: 'Space Grotesk', fontWeight: 700, letterSpacing: '0.1em' }}>YOUR_TOKEN</p>
+                  <p style={{ fontSize: '10px', color: '#3b494b', fontFamily: 'Space Grotesk', fontWeight: 700, letterSpacing: '0.1em' }}>AAPKA_TOKEN_HOGA</p>
                   <p className="neon-text" style={{ fontSize: '40px', fontFamily: 'Space Grotesk', fontWeight: 700 }}>#{estimate.queue_number}</p>
                   <div className="space-y-2 mt-3">
-                    <div className="flex justify-between"><span style={{ fontSize: '11px', color: '#3b494b', fontFamily: 'Space Grotesk' }}>BOOKING_AT</span><span style={{ fontSize: '13px', fontFamily: 'Space Grotesk', fontWeight: 700, color: '#e2e2e8' }}>{preferredTimeDisplay}</span></div>
+                    <div className="flex justify-between"><span style={{ fontSize: '11px', color: '#3b494b', fontFamily: 'Space Grotesk' }}>BOOKING_SAMAY</span><span style={{ fontSize: '13px', fontFamily: 'Space Grotesk', fontWeight: 700, color: '#e2e2e8' }}>{preferredTimeDisplay}</span></div>
                     <div className="flex items-center gap-2"><div className="flex-1 h-px" style={{ background: 'linear-gradient(to right, rgba(0,219,233,0.3), rgba(188,255,95,0.3))' }}></div><span className="material-symbols-outlined" style={{ fontSize: '14px', color: '#bcff5f' }}>arrow_forward</span><div className="flex-1 h-px" style={{ background: 'linear-gradient(to right, rgba(188,255,95,0.3), transparent)' }}></div></div>
-                    <div className="flex justify-between"><span style={{ fontSize: '11px', color: '#3b494b', fontFamily: 'Space Grotesk' }}>NUMBER_AT</span><span style={{ fontSize: '13px', fontFamily: 'Space Grotesk', fontWeight: 700, color: '#bcff5f' }}>{estimate.estimated_time_formatted}</span></div>
+                    <div className="flex justify-between"><span style={{ fontSize: '11px', color: '#3b494b', fontFamily: 'Space Grotesk' }}>NUMBER_AAYEGA</span><span style={{ fontSize: '13px', fontFamily: 'Space Grotesk', fontWeight: 700, color: '#bcff5f' }}>{estimate.estimated_time_formatted}</span></div>
                   </div>
                   <div className="mt-3 pt-3 flex justify-between" style={{ borderTop: '1px dashed rgba(59,73,75,0.3)' }}>
-                    <div><p style={{ fontSize: '10px', color: '#3b494b', fontFamily: 'Space Grotesk', fontWeight: 700 }}>AHEAD</p><p style={{ fontSize: '18px', fontFamily: 'Space Grotesk', fontWeight: 700, color: '#e2e2e8' }}>{estimate.patients_ahead}</p></div>
-                    <div className="text-right"><p style={{ fontSize: '10px', color: '#3b494b', fontFamily: 'Space Grotesk', fontWeight: 700 }}>WAIT</p><p style={{ fontSize: '18px', fontFamily: 'Space Grotesk', fontWeight: 700, color: '#e2e2e8' }}>{estimate.wait_minutes}m</p></div>
+                    <div><p style={{ fontSize: '10px', color: '#3b494b', fontFamily: 'Space Grotesk', fontWeight: 700 }}>PEHLE_HAIN</p><p style={{ fontSize: '18px', fontFamily: 'Space Grotesk', fontWeight: 700, color: '#e2e2e8' }}>{estimate.patients_ahead}</p></div>
+                    <div className="text-right"><p style={{ fontSize: '10px', color: '#3b494b', fontFamily: 'Space Grotesk', fontWeight: 700 }}>INTEZAAR</p><p style={{ fontSize: '18px', fontFamily: 'Space Grotesk', fontWeight: 700, color: '#e2e2e8' }}>{estimate.wait_minutes} min</p></div>
                   </div>
                 </div>
                 <div className="p-3 rounded" style={{ background: 'rgba(188,255,95,0.04)', border: '1px solid rgba(188,255,95,0.12)' }}>
                   <p style={{ fontSize: '12px', color: '#849495', lineHeight: 1.6 }}>
                     <span className="material-symbols-outlined align-middle mr-1" style={{ fontSize: '14px', color: '#bcff5f' }}>auto_awesome</span>
-                    <span style={{ color: '#e2e2e8', fontWeight: 600 }}>{selectedDoctor?.name}</span> se <span className="neon-text" style={{ fontWeight: 700 }}>{preferredTimeDisplay}</span> pe book karne pe token <span style={{ color: '#bcff5f', fontWeight: 700 }}>#{estimate.queue_number}</span> milega, number <span style={{ color: '#bcff5f', fontWeight: 700 }}>~{estimate.estimated_time_formatted}</span> tak aa jayega.
+                    <span style={{ color: '#e2e2e8', fontWeight: 600 }}>{selectedDoctor?.name}</span> se <span className="neon-text" style={{ fontWeight: 700 }}>{preferredTimeDisplay}</span> pe book karne pe <span style={{ color: '#e2e2e8', fontWeight: 600 }}>{formData.problem_type}</span> ka token <span style={{ color: '#bcff5f', fontWeight: 700 }}>#{estimate.queue_number}</span> milega, aapka number <span style={{ color: '#bcff5f', fontWeight: 700 }}>~{estimate.estimated_time_formatted}</span> tak aa jayega.
                   </p>
                 </div>
               </div>
             ) : (
-              <div className="p-5 text-center"><span className="material-symbols-outlined" style={{ fontSize: '32px', color: '#3b494b' }}>schedule</span><p style={{ color: '#3b494b', fontFamily: 'Space Grotesk', fontSize: '12px', marginTop: '8px' }}>SELECT_DOCTOR_AND_TIME</p></div>
+              <div className="p-5 text-center"><span className="material-symbols-outlined" style={{ fontSize: '32px', color: '#3b494b' }}>schedule</span><p style={{ color: '#3b494b', fontFamily: 'Space Grotesk', fontSize: '12px', marginTop: '8px' }}>DOCTOR_AUR_SAMAY_CHUNEIN</p></div>
             )}
           </div>
 
           {estimate?.ai_recommendation && (
             <div className="glass-panel p-5" style={{ borderColor: 'rgba(188,255,95,0.15)' }}>
               <h3 className="neon-label mb-3 flex items-center gap-2" style={{ fontSize: '12px', color: '#bcff5f' }}>
-                <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>smart_toy</span>AI_RECOMMENDATION</h3>
+                <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>smart_toy</span>AI_SALAH</h3>
               <div className="p-3 rounded" style={{ background: 'rgba(12,14,18,0.6)', border: '1px solid rgba(59,73,75,0.2)' }}>
-                <p style={{ fontSize: '10px', color: '#3b494b', fontFamily: 'Space Grotesk', fontWeight: 700 }}>OPTIMAL_TIME</p>
+                <p style={{ fontSize: '10px', color: '#3b494b', fontFamily: 'Space Grotesk', fontWeight: 700 }}>SAHI_SAMAY</p>
                 <p style={{ fontSize: '18px', fontFamily: 'Space Grotesk', fontWeight: 700, color: '#bcff5f' }}>{estimate.ai_recommendation.recommended_time}</p>
                 <p style={{ fontSize: '11px', color: '#849495', marginTop: '4px' }}>{estimate.ai_recommendation.reason}</p>
               </div>

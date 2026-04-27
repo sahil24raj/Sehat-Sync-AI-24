@@ -1,156 +1,346 @@
-# 🏥 MedAlloc AI — Smart Hospital Resource Allocation System
+<p align="center">
+  <img src="https://img.shields.io/badge/SEHAT_SYNC_AI-🏥-00dbe9?style=for-the-badge&labelColor=111318" alt="Sehat Sync AI" />
+  <img src="https://img.shields.io/badge/Made_In-INDIA_🇮🇳-bcff5f?style=for-the-badge&labelColor=111318" alt="Made in India" />
+  <img src="https://img.shields.io/badge/AI_Powered-Neon_MedTech-ffb4ab?style=for-the-badge&labelColor=111318" alt="AI Powered" />
+</p>
 
-MedAlloc AI is a full-stack, AI-powered web application designed to intelligently assign limited hospital resources (ICU beds, oxygen, ventilators) to patients based on urgency and real-time availability. It also features a **Smart Appointment Booking System** inspired by railway ticket booking, complete with queue prediction, token generation, and live tracking.
+<h1 align="center">⚡ SEHAT SYNC AI ⚡</h1>
+<h3 align="center">🇮🇳 Bharat Ka Apna AI-Powered Smart Hospital System 🇮🇳</h3>
 
----
-
-## 🚀 Features
-
-### Core — AI Resource Allocation
-- **Real-Time Dashboard**: Monitor hospital capacities via dynamic charts.
-- **AI Priority Engine**: Groq Cloud API (LLaMA 3) evaluates patient vitals and assigns a priority score (Low/Medium/High) instantly.
-- **Smart Allocation**: Automatically assigns high-priority patients to nearest hospitals with available ICU beds/ventilators.
-- **WebSocket Alerts**: Real-time notifications for new patients and resource depletion.
-
-### 🎫 Smart Appointment Booking System (NEW)
-- **Queue-Based Booking**: Patients receive a token number and estimated consultation time instead of fixed time slots.
-- **Smart Queue Algorithm**: Dynamically calculates wait times using `avg_consultation_time × patients_before_you`.
-- **Slot Types**: General Queue, Priority Queue, and Emergency (instant allocation).
-- **Live Queue Tracker**: Real-time view of current queue, estimated wait, and patient positions with Socket.io.
-- **Ticket-Style UI**: Beautiful train-ticket inspired booking confirmation card.
-- **AI No-Show Prediction**: ML endpoint predicts probability of patient not showing up.
-- **AI Time Recommendation**: Suggests optimal booking times based on problem type and doctor availability.
+<p align="center">
+  <b>Real-time hospital resource monitoring + Smart appointment booking + AI-driven patient allocation</b>
+  <br/>
+  <em>Jaise train ticket booking — waise hospital token booking! 🚆</em>
+</p>
 
 ---
 
-## 🛠️ Tech Stack
-| Layer | Technology |
-|-------|-----------|
-| **Frontend** | React.js (Vite), Tailwind CSS, Chart.js, Lucide Icons, React Router |
-| **Backend** | Node.js, Express.js, MongoDB (Memory Server), Socket.io |
-| **AI Service** | Python, FastAPI, Groq Cloud API (LLaMA 3) |
+## 📸 Screenshots
+
+### 🖥️ Dashboard — Hospital Sansadhan Overview
+Real-time mein sabhi hospitals ke ICU bistar, saadharan bistar, oxygen cylinder aur ventilator ka status dekhein.
+
+![Dashboard](screenshots/dashboard.png)
+
+### 📅 Smart Appointment Booking — Token System
+Doctor chunein, samay chunein — turant token number aur anumaan samay mil jayega. Bilkul train ticket jaisa!
+
+![Booking](screenshots/booking.png)
+
+### 📊 Live Queue Tracker — Real-Time Monitoring
+Sabhi mareez ka live queue status, doctor wise tracking, aur priority-based sorting.
+
+![Queue](screenshots/queue.png)
 
 ---
 
-## 🏗️ System Architecture
+## 🌟 Kya Hai Sehat Sync AI?
+
+**Sehat Sync AI** ek AI-powered smart hospital management system hai jo Bharat ke top hospitals (AIIMS, Fortis, Apollo, Medanta, Max) ke liye banaya gaya hai. Yeh system hospital resources ko real-time mein monitor karta hai, AI se mareez ki priority decide karta hai, aur smart token system se appointment booking karta hai.
+
+### 🎯 Mukhya Features
+
+| Feature | Vivaran |
+|---------|---------|
+| 🏥 **Real-Time Dashboard** | Sabhi hospitals ke ICU bistar, oxygen, ventilator ka live status |
+| 🤖 **AI Priority Scoring** | AI engine automatically mareez ki gambhirta score karta hai |
+| 🎫 **Smart Token System** | Train ticket booking jaisa — token number + anumaan samay |
+| 📊 **Live Queue Tracker** | Real-time mein doctor-wise queue monitoring |
+| 🔔 **Socket.io Alerts** | Turant notification jab resource critical ho |
+| 📱 **Responsive Design** | Mobile, tablet aur desktop par kaam kare |
+| 🌙 **Neon Cyberpunk UI** | Dark techy theme with cyan neon accents |
+
+---
+
+## 🏗️ Tech Stack
+
+### Frontend (Client)
+| Technology | Kaam |
+|-----------|------|
+| **React 18** + Vite | Fast SPA framework |
+| **Tailwind CSS** | Utility-first CSS styling |
+| **Chart.js** | Hospital data ke charts |
+| **Socket.io Client** | Real-time updates |
+| **React Router v6** | Page navigation |
+| **Space Grotesk + Inter** | Premium typography |
+
+### Backend (Server)
+| Technology | Kaam |
+|-----------|------|
+| **Node.js** + Express | REST API server |
+| **MongoDB** (Memory Server) | Database for hospitals & patients |
+| **Mongoose** | MongoDB ODM |
+| **Socket.io** | Real-time communication |
+| **CORS** | Cross-origin requests |
+
+### AI/ML Engine
+| Technology | Kaam |
+|-----------|------|
+| **Python FastAPI** | ML microservice |
+| **scikit-learn** | Priority scoring model |
+| **NumPy/Pandas** | Data processing |
+
+---
+
+## 📁 Project Structure
 
 ```
-┌──────────────────┐     REST + WebSocket     ┌──────────────────┐     HTTP     ┌──────────────────┐
-│   React Client   │ ◄──────────────────────► │  Node.js/Express │ ◄──────────► │  FastAPI (AI)    │
-│   (Vite + TW)    │                          │  + Socket.io     │              │  Groq LLaMA 3    │
-│   Port: 5173     │                          │  Port: 5000      │              │  Port: 8000      │
-└──────────────────┘                          └──────────────────┘              └──────────────────┘
-                                                      │
-                                              ┌───────┴────────┐
-                                              │  MongoDB       │
-                                              │  (In-Memory)   │
-                                              └────────────────┘
+SEHAT-SYNC-AI/
+├── 📂 client/                     # Frontend (React + Vite)
+│   ├── 📂 src/
+│   │   ├── 📂 components/
+│   │   │   ├── Dashboard.jsx      # Hospital sansadhan overview
+│   │   │   ├── PatientForm.jsx    # Mareez dakhila form
+│   │   │   ├── AppointmentBooking.jsx  # Smart token booking
+│   │   │   └── LiveQueueTracker.jsx    # Real-time queue
+│   │   ├── App.jsx                # Main app with routing
+│   │   ├── index.css              # Neon MedTech design system
+│   │   └── main.jsx               # Entry point
+│   ├── index.html                 # HTML template
+│   ├── package.json
+│   ├── tailwind.config.js
+│   └── vite.config.js
+├── 📂 server/                     # Backend (Node.js + Express)
+│   ├── 📂 models/
+│   │   ├── Hospital.js            # Hospital schema
+│   │   ├── Patient.js             # Patient schema
+│   │   └── Appointment.js         # Appointment schema
+│   ├── 📂 routes/
+│   │   └── api.js                 # All API endpoints
+│   ├── index.js                   # Server entry + Socket.io
+│   └── seed.js                    # Indian hospitals seed data
+├── 📂 ml-service/                 # AI/ML Engine (Python)
+│   ├── main.py                    # FastAPI ML endpoints
+│   └── requirements.txt
+├── 📂 screenshots/                # App screenshots
+│   ├── dashboard.png
+│   ├── booking.png
+│   └── queue.png
+└── README.md                      # Yeh file 📄
 ```
 
 ---
 
-## 📡 API Endpoints
+## 🏥 Indian Hospitals Data
 
-### Backend Server (`localhost:5000`)
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET` | `/api/hospitals` | Fetch all hospitals and resources |
-| `GET` | `/api/patients` | Fetch all patients with allocated hospitals |
-| `POST` | `/api/patients` | Submit patient → AI priority → auto-allocate hospital |
-| `POST` | `/api/appointments` | Book appointment → get queue token + estimated time |
-| `GET` | `/api/appointments/queue/:hospital_id` | Live queue for a hospital |
-| `PUT` | `/api/appointments/:id/status` | Update appointment status (Completed/No-show) |
+System mein yeh 5 major Indian hospitals configured hain:
 
-### AI Microservice (`localhost:8000`)
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `POST` | `/predict` | Priority scoring (age, oxygen, severity, comorbidities) |
-| `POST` | `/predict_no_show` | No-show probability prediction |
-| `POST` | `/recommend_time` | Optimal booking time recommendation |
-| `GET` | `/health` | Health check |
+| Hospital | Shehar | ICU | General | O2 | Ventilator | Ambulance |
+|----------|--------|-----|---------|-----|-----------|-----------|
+| **AIIMS Delhi** | Nai Dilli | 12 | 50 | 80 | 18 | 8 |
+| **Fortis Mumbai** | Mumbai | 8 | 35 | 60 | 12 | 6 |
+| **Apollo Chennai** | Chennai | 10 | 40 | 70 | 15 | 7 |
+| **Medanta Gurugram** | Gurugram | 6 | 25 | 55 | 8 | 5 |
+| **Max Saket** | Nai Dilli | 5 | 20 | 45 | 8 | 4 |
+
+## 👨‍⚕️ Doctors Panel
+
+| Doctor | Visheshagyta | Icon |
+|--------|-------------|------|
+| **Dr. Priya Sharma** | Aam Chikitsak (General Physician) | 🩺 |
+| **Dr. Rajesh Gupta** | Hriday Rog Visheshagya (Cardiologist) | ❤️ |
+| **Dr. Anjali Mehta** | Naadi Tantrika Visheshagya (Neurologist) | 🧠 |
+| **Dr. Vikram Patel** | Bachho Ke Doctor (Pediatrician) | 👶 |
 
 ---
 
-## ⚙️ Setup & Installation
+## 🚀 Setup & Installation
 
-### 1. AI Microservice (`/ml-service`)
+### Prerequisites
+- **Node.js** v18+
+- **Python** 3.9+
+- **npm** ya **yarn**
+
+### Step 1: Repository Clone Karein
 ```bash
-cd ml-service
-python -m venv venv
-.\venv\Scripts\activate   # Windows
-pip install -r requirements.txt
-
-# Create .env with Groq API Key
-echo GROQ_API_KEY=your_api_key_here > .env
-
-uvicorn main:app --reload --port 8000
+git clone https://github.com/sahil24raj/MedAlloc-AI-24.git
+cd MedAlloc-AI-24
 ```
-> **Note:** The system works without a GROQ_API_KEY — it will fall back to default priority scores.
 
-### 2. Node Backend Server (`/server`)
+### Step 2: Backend Setup
 ```bash
 cd server
 npm install
-npm start
+node index.js
 ```
-> Uses in-memory MongoDB by default. Set `MONGO_URI` in `.env` for persistent storage.
+> Server `http://localhost:5000` pe chalega
 
-### 3. React Frontend (`/client`)
+### Step 3: Frontend Setup
 ```bash
 cd client
 npm install
 npm run dev
 ```
+> Client `http://localhost:5173` pe chalega
 
----
-
-## 🧪 Demo Scenarios
-
-### Scenario 1: AI Patient Triage
-1. Start all three services.
-2. Open `http://localhost:5173` → Dashboard shows 3 pre-loaded hospitals.
-3. Navigate to **Patient Intake**.
-4. Enter high-priority patient: Age 75, Severity 95, SpO2 75%, Comorbidities Severe.
-5. Submit → AI marks as "High Priority", allocates ICU bed at nearest hospital.
-
-### Scenario 2: Smart Appointment Booking
-1. Navigate to **Book Appointment**.
-2. Select a hospital, doctor, set preferred time, and choose priority level.
-3. Click **Generate Smart Token** → receive a ticket-style confirmation with:
-   - Queue number
-   - Estimated consultation time
-   - Wait position
-4. Navigate to **Live Queue** to see real-time queue status and manage appointments.
-
----
-
-## 📁 Project Structure
+### Step 4: ML Service (Optional)
+```bash
+cd ml-service
+pip install -r requirements.txt
+uvicorn main:app --reload --port 8000
 ```
-AI HOSPITAL SYSTEM/
-├── client/                    # React Frontend
-│   └── src/
-│       ├── components/
-│       │   ├── Dashboard.jsx          # Hospital resource overview
-│       │   ├── PatientForm.jsx        # New patient intake form
-│       │   ├── AppointmentBooking.jsx # Smart booking + ticket UI
-│       │   └── LiveQueueTracker.jsx   # Real-time queue monitor
-│       ├── App.jsx                    # Main app with routing
-│       └── index.css                  # Glassmorphism design system
-├── server/                    # Node.js Backend
-│   ├── models/
-│   │   ├── Hospital.js
-│   │   ├── Patient.js
-│   │   └── Appointment.js
-│   ├── routes/
-│   │   └── api.js
-│   ├── seed.js
-│   └── index.js
-├── ml-service/                # Python AI Service
-│   ├── main.py
-│   └── requirements.txt
-└── README.md
+> ML Service `http://localhost:8000` pe chalega
+
+---
+
+## 🔌 API Endpoints
+
+### Hospitals
+| Method | Endpoint | Kaam |
+|--------|----------|------|
+| `GET` | `/api/hospitals` | Sabhi hospitals ki list |
+| `PUT` | `/api/hospitals/:id/resources` | Hospital resources update karein |
+
+### Patients (Mareez)
+| Method | Endpoint | Kaam |
+|--------|----------|------|
+| `GET` | `/api/patients` | Sabhi mareez ki list |
+| `POST` | `/api/patients` | Naya mareez register karein |
+
+### Appointments
+| Method | Endpoint | Kaam |
+|--------|----------|------|
+| `GET` | `/api/appointments/queue/:hospital_id` | Hospital ki live queue |
+| `GET` | `/api/appointments/doctor-slots/:hospital_id` | Doctor-wise slot status |
+| `POST` | `/api/appointments` | Naya appointment book karein |
+| `POST` | `/api/appointments/estimate` | Token & samay ka anumaan |
+| `PUT` | `/api/appointments/:id/status` | Appointment status update |
+
+---
+
+## 🎨 Design System — Neon MedTech
+
+### Color Palette
+| Naam | Hex Code | Kaam |
+|------|----------|------|
+| **Background** | `#111318` | Main dark background |
+| **Neon Cyan** | `#00dbe9` | Primary accent, links, highlights |
+| **Neon Lime** | `#bcff5f` | Success, availability, AI features |
+| **Neon Pink** | `#ffb4ab` | Danger, emergency, high priority |
+| **Blue Mist** | `#aec6ff` | Secondary info, ventilator stats |
+| **Dark Surface** | `#1e2024` | Card backgrounds, panels |
+| **Text Dim** | `#849495` | Secondary text, labels |
+| **Border Dark** | `#3b494b` | Borders, dividers |
+
+### Typography
+- **Headings**: Space Grotesk (Bold 700)
+- **Body**: Inter (Regular 400 / Semi-Bold 600)
+- **Labels**: Space Grotesk (Bold 700, UPPERCASE, letter-spacing 0.1em)
+
+### UI Components
+- **Glass Panels**: `backdrop-filter: blur(16px)` with neon borders
+- **Neon Buttons**: Cyan glow shadow `0 0 20px rgba(0,219,233,0.3)`
+- **Scanline Effect**: Animated horizontal line overlay
+- **Tech Grid**: Repeating dot pattern background
+- **Ticket Card**: Dashed border divider (jaisa railway ticket)
+
+---
+
+## 🎫 Smart Token System — Kaise Kaam Karta Hai?
+
+```
+1️⃣ Mareez HOSPITAL aur DOCTOR chunte hain
+2️⃣ Preferred SAMAY select karte hain
+3️⃣ AI engine LIVE QUEUE analyze karta hai
+4️⃣ System TOKEN NUMBER generate karta hai
+5️⃣ ANUMAAN SAMAY batata hai — "Aapka number ~10:30 tak aayega"
+6️⃣ AI RECOMMENDATION deta hai — "Agar 9:00 baje aayein toh kam wait hoga"
+```
+
+Bilkul IRCTC train booking jaisa experience! 🚆
+
+---
+
+## ⚡ Socket.io Real-Time Events
+
+| Event | Direction | Kaam |
+|-------|----------|------|
+| `resource_update` | Server → Client | Jab hospital resources change ho |
+| `new_patient` | Server → Client | Jab naya mareez register ho |
+| `appointment_new` | Server → Client | Jab nayi booking ho |
+| `appointment_update` | Server → Client | Jab appointment status change ho |
+| `alert` | Server → Client | Emergency notifications |
+
+---
+
+## 🤖 AI Priority Scoring Algorithm
+
+```
+Priority Score = (Severity × 0.4) + (Age Factor × 0.2) + 
+                 (Oxygen Factor × 0.25) + (Comorbidity × 0.15)
+
+Jahan:
+  - Severity: 0-100 (Mareez ki gambhirta)
+  - Age Factor: Bachche (<12) aur Buzurg (>60) ko zyada score
+  - Oxygen Factor: SpO2 < 90% = Critical
+  - Comorbidity: Purani bimari ka star (0, 1, 2)
+
+Result:
+  - Score > 70 → 🔴 ZYADA ZARURI (High Priority)
+  - Score 40-70 → 🟡 THODA ZARURI (Medium)
+  - Score < 40 → 🟢 SAADHARAN (Low)
 ```
 
 ---
 
-*Built for the Hackathon. Powered by AI. 🚀*
+## 🌐 Environment Variables
+
+### Client (`client/.env`)
+```env
+VITE_API_URL=http://localhost:5000
+```
+
+### Server (`server/.env`)
+```env
+PORT=5000
+MONGODB_URI=mongodb://localhost:27017/sehat-sync-ai
+ML_SERVICE_URL=http://localhost:8000
+```
+
+---
+
+## 📋 Aage Kya Banana Hai? (Roadmap)
+
+- [ ] 🔐 JWT Authentication — Login/Signup system
+- [ ] 📱 WhatsApp/SMS Notifications via Twilio
+- [ ] 🗺️ Google Maps Integration — Nearest hospital
+- [ ] 💳 Online Payment Gateway (Razorpay)
+- [ ] 📊 Advanced Analytics Dashboard
+- [ ] 🏥 MongoDB Atlas pe migrate (production)
+- [ ] 🌐 Multi-language support (Hindi, Tamil, Bengali)
+- [ ] 📄 PDF Token/Receipt generation
+
+---
+
+## 🤝 Contribute Kaise Karein?
+
+1. **Fork** karein yeh repo
+2. Apna **branch** banayein (`git checkout -b feature/naya-feature`)
+3. Changes **commit** karein (`git commit -m 'feat: naya feature add kiya'`)
+4. Branch pe **push** karein (`git push origin feature/naya-feature`)
+5. **Pull Request** kholein
+
+---
+
+## 👨‍💻 Developers
+
+| Developer | Role |
+|-----------|------|
+| **Sahil Raj** | Full-Stack Developer & AI Engineer |
+
+---
+
+## 📜 License
+
+Yeh project **MIT License** ke under hai. Matlab aap ise freely use, modify aur distribute kar sakte hain.
+
+---
+
+<p align="center">
+  <b>⚡ SEHAT_SYNC_AI — SMART HOSPITAL SYSTEM — BHARAT 🇮🇳 ⚡</b>
+  <br/>
+  <em>Made with ❤️ in India | Powered by AI</em>
+  <br/><br/>
+  <img src="https://img.shields.io/badge/Status-SYSTEM_CHALU_✅-bcff5f?style=flat-square&labelColor=111318" />
+  <img src="https://img.shields.io/badge/Version-v4.0-00dbe9?style=flat-square&labelColor=111318" />
+</p>
