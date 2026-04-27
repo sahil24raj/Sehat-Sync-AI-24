@@ -1,4 +1,3 @@
-require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const http = require('http');
@@ -40,12 +39,15 @@ io.on('connection', (socket) => {
 
 // Import API routes
 const apiRoutes = require('./routes/api')(io);
-app.use('/api', apiRoutes);
 
-app.get('/', (req, res) => {
+// Mount routes at BOTH /api and root for maximum compatibility with Vercel routing
+app.use('/api', apiRoutes);
+app.use('/', apiRoutes);
+
+app.get('/health', (req, res) => {
   res.json({ 
     status: 'ok', 
-    message: 'Sehat Sync AI — API Running (Firebase Mode)', 
+    message: 'Sehat Sync AI — API Running', 
     db: !!db 
   });
 });
