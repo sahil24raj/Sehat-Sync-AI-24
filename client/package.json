@@ -34,7 +34,7 @@
     "dotenv": "^16.3.1",
     "socket.io": "^4.7.2"
   },
-  "devDependencies": {
+  "devDependencies": {`n    "tailwindcss": "^3.3.0",`n    "autoprefixer": "^10.4.16",`n    "postcss": "^8.4.31",
     "@types/react": "^18.2.37",
     "@types/react-dom": "^18.2.15",
     "@vitejs/plugin-react": "^4.2.0",
