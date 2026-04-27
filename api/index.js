@@ -1,15 +1,19 @@
-const app = require('../server/index');
+const express = require('express');
+const cors = require('cors');
 
-module.exports = (req, res) => {
-  // Ensure we handle CORS at the very beginning of the serverless execution
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+// Initialize Express
+const app = express();
+app.use(cors());
+app.use(express.json());
 
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
+// Import routes directly
+// We keep the routes in server/routes/api.js but ensure require path is absolute or correct
+const io = { emit: () => {} };
+const apiRoutes = require('../server/routes/api')(io);
 
-  // Pass control to Express
-  return app(req, res);
-};
+// Mount routes
+app.use('/api', apiRoutes);
+app.use('/', apiRoutes); // Fallback for various rewrite behaviors
+
+// Export the app
+module.exports = app;
