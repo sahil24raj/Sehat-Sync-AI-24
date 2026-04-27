@@ -1,0 +1,219 @@
+@import "tailwindcss";
+
+/* ===== NEON MEDTECH AI — Design System ===== */
+/* Inspired by Stitch: Neuro-Core Ops Login */
+
+@layer base {
+  body {
+    background-color: #111318;
+    color: #e2e2e8;
+    font-family: 'Inter', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Space Grotesk', sans-serif;
+  }
+
+  /* Custom scrollbar — neon */
+  ::-webkit-scrollbar { width: 5px; }
+  ::-webkit-scrollbar-track { background: #111318; }
+  ::-webkit-scrollbar-thumb { background: #1e2024; border-radius: 999px; }
+  ::-webkit-scrollbar-thumb:hover { background: #00dbe9; }
+
+  ::selection {
+    background: rgba(0, 219, 233, 0.25);
+    color: #fff;
+  }
+}
+
+/* ===== GLASSMORPHISM PANEL ===== */
+.glass-panel {
+  background: rgba(17, 19, 24, 0.75);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(0, 219, 233, 0.12);
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
+  transition: all 0.3s ease;
+}
+
+.glass-panel:hover {
+  border-color: rgba(0, 219, 233, 0.25);
+  box-shadow: 0 0 20px rgba(0, 219, 233, 0.06), 0 8px 40px rgba(0, 0, 0, 0.5);
+}
+
+/* ===== TECH GRID BACKGROUND ===== */
+.tech-grid {
+  background-size: 40px 40px;
+  background-image:
+    linear-gradient(to right, rgba(0, 219, 233, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 219, 233, 0.04) 1px, transparent 1px);
+}
+
+/* ===== NEON GLOW EFFECTS ===== */
+.neon-glow {
+  box-shadow: 0 0 15px rgba(0, 219, 233, 0.3);
+}
+
+.neon-glow-green {
+  box-shadow: 0 0 15px rgba(188, 255, 95, 0.25);
+}
+
+.neon-text {
+  color: #00dbe9;
+  text-shadow: 0 0 10px rgba(0, 219, 233, 0.4);
+}
+
+.neon-text-green {
+  color: #bcff5f;
+  text-shadow: 0 0 10px rgba(188, 255, 95, 0.4);
+}
+
+/* ===== SCANLINE EFFECT ===== */
+@keyframes scanline-move {
+  0% { top: -100px; }
+  100% { top: 100%; }
+}
+
+.scanline {
+  width: 100%;
+  height: 80px;
+  z-index: 10;
+  background: linear-gradient(0deg, rgba(0, 219, 233, 0) 0%, rgba(0, 219, 233, 0.03) 50%, rgba(0, 219, 233, 0) 100%);
+  position: absolute;
+  pointer-events: none;
+  animation: scanline-move 6s linear infinite;
+}
+
+/* ===== SHIMMER ===== */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.animate-shimmer {
+  background: linear-gradient(90deg, transparent, rgba(0, 219, 233, 0.03), transparent);
+  background-size: 200% 100%;
+  animation: shimmer 2.5s infinite;
+}
+
+/* ===== TICKET GLOW ===== */
+.ticket-shadow {
+  box-shadow: 0 20px 50px -12px rgba(0, 219, 233, 0.15), 0 0 30px -10px rgba(0, 219, 233, 0.08);
+}
+
+/* ===== PULSE GLOW ===== */
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(0, 219, 233, 0.5); }
+  50% { box-shadow: 0 0 0 8px rgba(0, 219, 233, 0); }
+}
+
+.pulse-glow {
+  animation: pulseGlow 2s infinite;
+}
+
+@keyframes pulseGlowGreen {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(188, 255, 95, 0.5); }
+  50% { box-shadow: 0 0 0 8px rgba(188, 255, 95, 0); }
+}
+
+.pulse-glow-green {
+  animation: pulseGlowGreen 2s infinite;
+}
+
+/* ===== NEON BUTTON ===== */
+.neon-btn {
+  background: rgba(0, 219, 233, 0.08);
+  border: 1px solid rgba(0, 219, 233, 0.35);
+  color: #00dbe9;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  transition: all 0.3s ease;
+}
+
+.neon-btn:hover {
+  background: rgba(0, 219, 233, 0.15);
+  box-shadow: 0 0 20px rgba(0, 219, 233, 0.3);
+}
+
+.neon-btn-solid {
+  background: #00dbe9;
+  color: #111318;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  box-shadow: 0 0 20px rgba(0, 219, 233, 0.4);
+  transition: all 0.3s ease;
+}
+
+.neon-btn-solid:hover {
+  filter: brightness(1.15);
+  box-shadow: 0 0 30px rgba(0, 219, 233, 0.5);
+}
+
+.neon-btn-solid:active {
+  transform: scale(0.97);
+}
+
+/* ===== NEON INPUT ===== */
+.neon-input {
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid rgba(59, 73, 75, 0.5);
+  color: #e2e2e8;
+  font-family: 'Inter', sans-serif;
+  padding: 0.625rem 0;
+  outline: none;
+  transition: border-color 0.3s;
+  width: 100%;
+}
+
+.neon-input:focus {
+  border-bottom-color: #00dbe9;
+}
+
+.neon-input::placeholder {
+  color: rgba(132, 148, 149, 0.6);
+}
+
+/* ===== LABEL STYLE ===== */
+.neon-label {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #00dbe9;
+}
+
+/* ===== STATUS CHIPS ===== */
+.chip-operational {
+  color: #bcff5f;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.chip-danger {
+  color: #ffb4ab;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* ===== FOOTER STYLE ===== */
+.sys-footer {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(132, 148, 149, 0.4);
+}
