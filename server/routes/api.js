@@ -1,13 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const axios = require('axios');
-const Hospital = require('../models/Hospital');
-const Patient = require('../models/Patient');
-const Appointment = require('../models/Appointment');
+const { db } = require('../firebase');
 
-// Utility to calculate distance between two coordinates (Haversine formula)
+// Utility to calculate distance between two coordinates
 function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
-  var R = 6371; // Radius of the earth in km
+  var R = 6371;
   var dLat = deg2rad(lat2-lat1);
   var dLon = deg2rad(lon2-lon1); 
   var a = 
@@ -16,7 +14,7 @@ function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
     Math.sin(dLon/2) * Math.sin(dLon/2)
     ; 
   var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
-  var d = R * c; // Distance in km
+  var d = R * c;
   return d;
 }
 
@@ -28,7 +26,9 @@ module.exports = function(io) {
   // Get all hospitals
   router.get('/hospitals', async (req, res) => {
     try {
-      const hospitals = await Hospital.find();
+      if (!db) throw new Error("Database not initialized");
+      const snapshot = await db.collection('hospitals').get();
+      const hospitals = snapshot.docs.map(doc => ({ _id: doc.id, ...doc.data() }));
       res.json(hospitals);
     } catch (err) {
       res.status(500).json({ message: err.message });
@@ -38,7 +38,21 @@ module.exports = function(io) {
   // Get all patients
   router.get('/patients', async (req, res) => {
     try {
-      const patients = await Patient.find().populate('allocated_hospital').sort({ createdAt: -1 });
+      if (!db) throw new Error("Database not initialized");
+      const snapshot = await db.collection('patients').orderBy('createdAt', 'desc').get();
+      const patients = [];
+      
+      for (const doc of snapshot.docs) {
+        const patientData = { _id: doc.id, ...doc.data() };
+        if (patientData.allocated_hospital) {
+          const hospDoc = await db.collection('hospitals').doc(patientData.allocated_hospital).get();
+          if (hospDoc.exists) {
+            patientData.allocated_hospital = { _id: hospDoc.id, ...hospDoc.data() };
+          }
+        }
+        patients.push(patientData);
+      }
+      
       res.json(patients);
     } catch (err) {
       res.status(500).json({ message: err.message });
@@ -48,9 +62,9 @@ module.exports = function(io) {
   // Add a new patient and allocate hospital
   router.post('/patients', async (req, res) => {
     try {
+      if (!db) throw new Error("Database not initialized");
       const { name, age, symptoms, symptoms_severity, oxygen_level, comorbidities, location } = req.body;
 
-      // 1. Get Priority from ML Service
       let priority_score = 50;
       let priority_label = "Medium";
       const ML_SERVICE_URL = process.env.ML_SERVICE_URL || 'http://127.0.0.1:8000';
@@ -61,7 +75,7 @@ module.exports = function(io) {
           oxygen_level: parseInt(oxygen_level) || 95,
           symptoms_severity: parseInt(symptoms_severity) || 50,
           comorbidities: parseInt(comorbidities) || 0
-        }, { timeout: 3000 }); // 3 second timeout for AI
+        }, { timeout: 3000 });
         
         priority_score = mlResponse.data.priority_score;
         priority_label = mlResponse.data.priority_label;
@@ -69,19 +83,17 @@ module.exports = function(io) {
         console.error("ML Service error (fallback used):", mlErr.message);
       }
 
-      // 2. Find nearest hospital with resources
-      const hospitals = await Hospital.find();
+      const hospSnapshot = await db.collection('hospitals').get();
+      const hospitals = hospSnapshot.docs.map(doc => ({ _id: doc.id, ...doc.data() }));
+      
       let nearestHospital = null;
       let minDistance = Infinity;
 
       for (let h of hospitals) {
-        if (!h.location || typeof h.location.lat !== 'number' || typeof h.location.lng !== 'number') continue;
-        
         const patientLat = location?.lat || 28.6139;
         const patientLng = location?.lng || 77.2090;
         
         const dist = getDistanceFromLatLonInKm(patientLat, patientLng, h.location.lat, h.location.lng);
-        // Basic check: Needs ICU if severity is high or oxygen is very low, else general bed
         let canAccept = false;
         if (priority_label === 'High') {
           if (h.resources.icu_beds > 0 && h.resources.ventilators > 0) canAccept = true;
@@ -95,25 +107,27 @@ module.exports = function(io) {
         }
       }
 
-      // 3. Create Patient
-      const newPatient = new Patient({
+      const newPatientData = {
         name, age, symptoms, symptoms_severity, oxygen_level, comorbidities, location,
         priority_score, priority_label,
         allocated_hospital: nearestHospital ? nearestHospital._id : null,
-        status: nearestHospital ? 'Allocated' : 'Pending'
-      });
-      await newPatient.save();
+        status: nearestHospital ? 'Allocated' : 'Pending',
+        createdAt: new Date().toISOString()
+      };
 
-      // 4. Update Hospital Resources if allocated
+      const docRef = await db.collection('patients').add(newPatientData);
+      const newPatient = { _id: docRef.id, ...newPatientData };
+
       if (nearestHospital) {
+        const hospRef = db.collection('hospitals').doc(nearestHospital._id);
         if (priority_label === 'High') {
           nearestHospital.resources.icu_beds -= 1;
           nearestHospital.resources.ventilators -= 1;
         } else {
           nearestHospital.resources.general_beds -= 1;
         }
-        await nearestHospital.save();
-        io.emit('resource_update', { hospital: nearestHospital });
+        await hospRef.update({ resources: nearestHospital.resources });
+        io.emit('resource_update', { hospital: { _id: nearestHospital._id, ...nearestHospital } });
       }
 
       io.emit('new_patient', { patient: newPatient });
@@ -121,8 +135,12 @@ module.exports = function(io) {
         io.emit('alert', { message: `CRITICAL: No beds available for high priority patient ${name}!` });
       }
 
-      const populatedPatient = await Patient.findById(newPatient._id).populate('allocated_hospital');
-      res.status(201).json(populatedPatient);
+      if (newPatient.allocated_hospital) {
+        const hospDoc = await db.collection('hospitals').doc(newPatient.allocated_hospital).get();
+        newPatient.allocated_hospital = { _id: hospDoc.id, ...hospDoc.data() };
+      }
+
+      res.status(201).json(newPatient);
     } catch (err) {
       console.error(err);
       res.status(500).json({ message: err.message });
@@ -131,32 +149,30 @@ module.exports = function(io) {
 
   // --- Appointment Booking Routes ---
 
-  // Preview queue estimation (like "Check Availability" in train booking)
   router.post('/appointments/estimate', async (req, res) => {
     try {
+      if (!db) throw new Error("Database not initialized");
       const { hospital_id, doctor_name, preferred_time, priority_level } = req.body;
 
-      // Count patients waiting for THIS specific doctor at THIS hospital
-      const doctorQueue = await Appointment.find({
-        hospital_id,
-        doctor_name,
-        status: 'Waiting'
-      }).sort({ queue_number: 1 });
+      const snapshot = await db.collection('appointments')
+        .where('hospital_id', '==', hospital_id)
+        .where('doctor_name', '==', doctor_name)
+        .where('status', '==', 'Waiting')
+        .orderBy('queue_number', 'asc')
+        .get();
 
+      const doctorQueue = snapshot.docs.map(doc => ({ _id: doc.id, ...doc.data() }));
       const patientsAhead = doctorQueue.length;
-      const avg_consultation_time = 20; // minutes per patient
+      const avg_consultation_time = 20;
 
-      // Calculate estimated token & time
       const queue_number = patientsAhead + 1;
       let preferredDate = preferred_time ? new Date(preferred_time) : new Date();
-      if (isNaN(preferredDate.getTime())) preferredDate = new Date(); // fallback for invalid dates
+      if (isNaN(preferredDate.getTime())) preferredDate = new Date();
       
-      // If preferred time is in future, start from there; else from now
       const startFrom = preferredDate > new Date() ? preferredDate : new Date();
       const waitMinutes = patientsAhead * avg_consultation_time;
       const estimated_time = new Date(startFrom.getTime() + waitMinutes * 60000);
 
-      // Build a summary of who's ahead
       const queuePreview = doctorQueue.map((a, i) => ({
         position: i + 1,
         patient_name: a.patient_name,
@@ -164,26 +180,13 @@ module.exports = function(io) {
         estimated_time: new Date(startFrom.getTime() + i * avg_consultation_time * 60000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       }));
 
-      // Get AI recommendation if ML service is running
-      let ai_recommendation = null;
-      try {
-        const mlRes = await axios.post('http://127.0.0.1:8000/recommend_time', {
-          doctor_name,
-          problem_type: req.body.problem_type || 'General',
-          preferred_time: preferredDate.toISOString(),
-          priority_level: priority_level || 'General'
-        });
-        ai_recommendation = mlRes.data;
-      } catch (e) {
-        // ML service not running — provide smart fallback
-        const hour = preferredDate.getHours();
-        if (hour < 10) {
-          ai_recommendation = { recommended_time: '10:00', reason: 'Morning slots (10-12 AM) have the shortest wait times for this doctor.' };
-        } else if (hour >= 12 && hour < 14) {
-          ai_recommendation = { recommended_time: '14:30', reason: 'Post-lunch slots have fewer patients in queue. Avoid 12-2 PM rush.' };
-        } else {
-          ai_recommendation = { recommended_time: `${hour}:30`, reason: 'Current slot looks optimal. Low patient density detected.' };
-        }
+      // Basic AI Fallback
+      const hour = preferredDate.getHours();
+      let ai_recommendation = { recommended_time: `${hour}:30`, reason: 'Current slot looks optimal. Low patient density detected.' };
+      if (hour < 10) {
+        ai_recommendation = { recommended_time: '10:00', reason: 'Morning slots (10-12 AM) have the shortest wait times for this doctor.' };
+      } else if (hour >= 12 && hour < 14) {
+        ai_recommendation = { recommended_time: '14:30', reason: 'Post-lunch slots have fewer patients in queue. Avoid 12-2 PM rush.' };
       }
 
       res.json({
@@ -202,18 +205,20 @@ module.exports = function(io) {
     }
   });
 
-  // Get doctor-wise queue counts at a hospital (for showing all doctor slots)
   router.get('/appointments/doctor-slots/:hospital_id', async (req, res) => {
     try {
+      if (!db) throw new Error("Database not initialized");
       const allDoctors = ['Dr. Priya Sharma', 'Dr. Rajesh Gupta', 'Dr. Anjali Mehta', 'Dr. Vikram Patel'];
       const slots = [];
 
       for (const doctor of allDoctors) {
-        const count = await Appointment.countDocuments({
-          hospital_id: req.params.hospital_id,
-          doctor_name: doctor,
-          status: 'Waiting'
-        });
+        const snapshot = await db.collection('appointments')
+          .where('hospital_id', '==', req.params.hospital_id)
+          .where('doctor_name', '==', doctor)
+          .where('status', '==', 'Waiting')
+          .get();
+        
+        const count = snapshot.size;
         const waitMins = count * 20;
         const estTime = new Date(Date.now() + waitMins * 60000);
         slots.push({
@@ -231,76 +236,73 @@ module.exports = function(io) {
     }
   });
 
-  // Book a new appointment
   router.post('/appointments', async (req, res) => {
     try {
+      if (!db) throw new Error("Database not initialized");
       const { patient_name, hospital_id, doctor_name, problem_type, preferred_time, priority_level } = req.body;
 
-      // 1. Calculate Queue Position
-      const waitingCount = await Appointment.countDocuments({ 
-        hospital_id, 
-        status: 'Waiting' 
-      });
+      const snapshot = await db.collection('appointments')
+        .where('hospital_id', '==', hospital_id)
+        .where('status', '==', 'Waiting')
+        .get();
 
-      const queue_number = waitingCount + 1;
-      
-      // 2. Estimate consultation time (20 mins per patient before)
-      const avg_consultation_time = 20; // minutes
-      const now = new Date();
-      const waitTime = waitingCount * avg_consultation_time;
-      const estimated_time = new Date(now.getTime() + waitTime * 60000);
+      const queue_number = snapshot.size + 1;
+      const waitTime = snapshot.size * 20;
+      const estimated_time = new Date(Date.now() + waitTime * 60000);
 
-      // 3. Create Appointment
-      const appointment = new Appointment({
+      const appointmentData = {
         patient_name,
         hospital_id,
         doctor_name,
         problem_type,
-        preferred_time: (preferred_time && !isNaN(new Date(preferred_time).getTime())) ? new Date(preferred_time) : new Date(),
+        preferred_time: (preferred_time && !isNaN(new Date(preferred_time).getTime())) ? new Date(preferred_time).toISOString() : new Date().toISOString(),
         queue_number,
-        estimated_time,
+        estimated_time: estimated_time.toISOString(),
         priority_level: priority_level || 'General',
-        status: 'Waiting'
-      });
+        status: 'Waiting',
+        createdAt: new Date().toISOString()
+      };
 
-      await appointment.save();
+      const docRef = await db.collection('appointments').add(appointmentData);
+      const appointment = { _id: docRef.id, ...appointmentData };
 
-      // 4. Emit update
       io.emit('appointment_new', { appointment });
-      
       res.status(201).json(appointment);
     } catch (err) {
       res.status(500).json({ message: err.message });
     }
   });
 
-  // Get live queue for a hospital
   router.get('/appointments/queue/:hospital_id', async (req, res) => {
     try {
-      const appointments = await Appointment.find({ 
-        hospital_id: req.params.hospital_id,
-        status: 'Waiting'
-      }).sort({ queue_number: 1 });
+      if (!db) throw new Error("Database not initialized");
+      const snapshot = await db.collection('appointments')
+        .where('hospital_id', '==', req.params.hospital_id)
+        .where('status', '==', 'Waiting')
+        .orderBy('queue_number', 'asc')
+        .get();
       
+      const appointments = snapshot.docs.map(doc => ({ _id: doc.id, ...doc.data() }));
       res.json(appointments);
     } catch (err) {
       res.status(500).json({ message: err.message });
     }
   });
 
-  // Update appointment status (e.g., Completed)
   router.put('/appointments/:id/status', async (req, res) => {
     try {
+      if (!db) throw new Error("Database not initialized");
       const { status } = req.body;
-      const appointment = await Appointment.findByIdAndUpdate(req.params.id, { status }, { returnDocument: 'after' });
+      const docRef = db.collection('appointments').doc(req.params.id);
+      const doc = await docRef.get();
       
-      if (!appointment) return res.status(404).json({ message: 'Appointment not found' });
+      if (!doc.exists) return res.status(404).json({ message: 'Appointment not found' });
 
-      // If completed or no-show, recalculate queue for others? 
-      // For simplicity, we just notify clients to refresh
-      io.emit('appointment_update', { appointment });
+      await docRef.update({ status });
+      const updatedAppointment = { _id: doc.id, ...doc.data(), status };
 
-      res.json(appointment);
+      io.emit('appointment_update', { appointment: updatedAppointment });
+      res.json(updatedAppointment);
     } catch (err) {
       res.status(500).json({ message: err.message });
     }

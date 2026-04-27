@@ -1,6 +1,4 @@
-const mongoose = require('mongoose');
-const Hospital = require('./models/Hospital');
-require('dotenv').config();
+const { db } = require('./firebase');
 
 const dummyHospitals = [
   {
@@ -61,7 +59,20 @@ const dummyHospitals = [
 ];
 
 module.exports = async function seedHospitals() {
-  await Hospital.deleteMany({});
-  await Hospital.insertMany(dummyHospitals);
-  console.log("Indian hospitals seeded successfully.");
+  if (!db) return;
+  
+  const hospitalsCol = db.collection('hospitals');
+  const snapshot = await hospitalsCol.limit(1).get();
+  
+  // Only seed if empty
+  if (snapshot.empty) {
+    console.log("Seeding Firestore with hospitals...");
+    const batch = db.batch();
+    dummyHospitals.forEach(h => {
+      const docRef = hospitalsCol.doc();
+      batch.set(docRef, h);
+    });
+    await batch.commit();
+    console.log("Indian hospitals seeded to Firestore successfully.");
+  }
 };
