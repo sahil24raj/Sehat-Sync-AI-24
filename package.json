@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "build": "npm install --prefix client && npm run build --prefix client && npx -y shx rm -rf public && npx -y shx cp -r client/dist public"
+    "build": "npm install --prefix client && npm run build --prefix client && node copy-dist.js"
   },
   "dependencies": {
     "axios": "^1.6.0",

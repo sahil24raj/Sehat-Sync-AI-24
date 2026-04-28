@@ -22,3 +22,10 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Built files
+/assets
+/favicon.svg
+/icons.svg
+/index.html
+/public
